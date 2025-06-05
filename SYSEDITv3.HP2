@@ -1,0 +1,680 @@
+#!/bin/bash
+# SYSEDITv3.HP2 - Perform update to HP-Pavilion running 3.x system.
+#	6/4/25.	wmk.	16:15
+#
+# Usage. bash   SYSEDITv3 <option>  <shellfile-name>
+#		SYSEDITv3 config <type> [--revert]		 
+#
+#   <option> = SYSEDIT option; to be defined, but can be .bashrc or .gitconfig update,
+#              LibreCalc update to mention a few...
+#	SYSEDIT - update SYSEDIT bash shell on $HOME/sysprocs
+#
+#	LibreOffice - copy BadAss, XRay libraries to LibreOffice../user/basic area
+#	LibreCalc	and copy Standard/Module1.xba to ../user/basic/Standard
+#			depends on CALC_LIB_PATH set correctly in .bashrc
+#
+#	bash - copy .bashrc to ~/ and suggest terminal restart to pick up changes
+#
+#	proc - copy <shellfile_name> to $HOME/sysprocs and 
+#			to path WINUBUNTU/sysprocs
+#           <shellfile-name> = proc to update in $HOME/sysprocs and
+#              on path WINUBUNTU/sysprocs (e.g. InstallWifi.sh)
+#	start - copy <shellfile_name> to ~/sysstart and WINUBUNTU_PATH/sysstart
+#
+#  config = use SYSEDIT to change configuration
+#
+#	<type> = acct|mach|terr <congno>
+#	  mach - Machine
+#	  acct - Accounting
+#	  terr - Terr<congno> where <congno> is congregation number
+#
+# Entry. WINUBUNTU_PATH = ver2.0 path to Windows/ubuntu
+#	CONFIG_PATH = system configuration path
+#
+# Modification History.
+# ---------------------
+# 6/4/25.	wmk.	remove *CONFIG_PATH dependency introduced with 6/3/25
+# 6/4/25.	 mods; *WINUBUNTU_PATH replaces *folderbase/ubuntu.
+# 6/3/25.	wmk.	'config mach' updated to use *CONFIG_PATH for consistency.
+# 6/3/25.	wmk.	(automated) Modification History sorted.
+# 6/3/25.	wmk.	(automated) Modification History lines dated.
+# 11/6/23.	wmk.	SYSEDIT_VERSION 2.3.0; .bashrc, .bash_aliases now load
+# 11/6/23.	 and execute Machine/config.sh to set system-wide environment vars;
+# 11/6/23.	 .bashrc and .bash_aliases obtained from *gitpath/VersionControl
+# 11/6/23.	 folders.
+# 11/7/23.	wmk.	CONFIG_VERSION check for compatibility.
+# 11/11/23.	wmk.	bug fix ~/sysprocs > *HOME/sysprocs throughout.
+# 11/22/23.	wmk.	sysedit-version 2.3.2 for Chromebook systems > 2.3.3; uses
+# 11/22/23.	 TerrVersion/GetLatestCfg.sh for "config" processing;
+# 11/22/23.	 rucycle, sccycle, srccycle deprecated.
+# 11/27/23.	wmk.	'config terr' updated for use with new GetLatestCfg.
+# 11/30/23.	wmk.	sysedit-version 2.3.2 for HPPavilion system > 2.3.3; uses
+# 11/30/23.	 VersionControl/GetLatestCfg.sh, TerrVersion/GetLatestCfg.sh for
+# 11/30/23.	 "config"	processing.
+# 11/30/23.	 Legacy mods.
+# 11/5/23.	wmk.	sysedit-version 2.2.3; "config" <type> support added where
+# 11/5/23.	 <type> = mach|terr|acct
+# 9/21/23.	wmk.	sysedit-version 2.2.1; "config" support added; LOGMSG
+# 9/21/23.	 replaced throughout with *printf for Chromebook.
+# 9/24/23.	wmk.	"rucycle", "sccycle", "version" added.
+# 9/24/23.	wmk.	sysedit-version 2.2.2;"help" added.
+# 10/4/23.	wmk.	MERGE with code from origin/Lenovo; compatibility check
+# 10/4/23.	 changed to look for 'ubuntu'; SYSEDIT.html hyperlink corrected for
+# 10/4/23.	 HP Pavilion system.
+# 10/7/23.	wmk.	.bash copies specific to *SYSID; sysedit_version 2.2.2.
+# 10/7/23.	 Legacy mods.
+# 9/5/23.	wmk.	Territories-ver2.0 migration; paths updated; handle errors
+# 9/5/23.	 when not interactive; turn off system_log,ing when 'proc' and
+# 9/5/23.	 LOGMSG.
+# 9/5/23.	wmk.	version control enforced; SYSEDIT must be compatible with
+# 9/5/23.	 *SYS_VERSION environment var setting; *USER checked against
+# 9/5/23.	 'ubuntu'.
+# 9/16/23.	wmk.	filename change to SYSEDITv3 for positive identification.
+# 9/19/23.	wmk.	SYS_VERSION checked against
+# 9/19/23.	 chromeos-Version-116.05845.168/ver1.0.1; "bash" section
+# 9/19/23.	 updated; messages updated with SYSEDITv3.
+# 9/20/23.	wmk.	sysedit_version local env var set; *sysedit_version added to
+# 9/20/23.	 messages for clarification.
+# 7/29/22.	wmk.	Chromebook/HP dual support; eliminate jumpto function for
+# 7/29/22.	 Chromebook compatibility.
+# 10/3/22.	wmk.	bug fixes for Chromebook support; jumpto references replaced;
+# 10/3/22.	 Legacy mods.
+# 2/13/21.	wmk.	total rewrite based on/7/30 version, but using
+# 2/13/21.	 jumpto definition to clean up logic.
+# 7/22/20.	wmk.	"libreoffice" case modified to list manual changes to be
+# 7/22/20.	 made by user to bring LibreOffice/LibreCalc up-to-date
+# 7/24/20.	wmk.	"bash" case modified to also copy .bashrc to the
+# 7/24/20.	 install path $WINUBUNTU_PATH
+# 7/27/20.	wmk.	"proc" case added to update procs in $HOME/sysprocs;
+# 7/27/20.	 "start" case added to update procs in ~/sysstart
+# 7/30/20.	wmk.	"bash" case modified to also copy .bashrc to the
+# 7/30/20.	 ~/sysstart directory
+# 3/1/21.	wmk.	modified for running with make; no environment vars
+# 3/1/21.	 inherited.
+# 5/25/21.	wmk.	modified for running on Kay's system; KSYSEDIT.
+# 6/13/21.	wmk.	modified for any multihost support.
+#endmods
+#
+# Notes. SYSEDIT now uses the .config/Machine environment variables to determine
+# its compatibility with the running system: 
+#
+#	machine_name = 'HP-Pavilion'
+#	SYSID = 'HP1'
+#	OS_VERSION = 'ubuntu-Version-18.0.4'
+#	SYS_VERSION = 'SYS_VERSION=$OS_VERSION/$SC_BUILD/$RU_BUILD'
+#	CONFIG_VERSION = '2.2.8'
+#	libre_version = '7.5.6.2'
+#
+# The OS_VERSION and CONFIG_VERSION of the running system MUST be compatible
+# with SYSEDIT or SYSEDIT will terminate. This prevents SYSEDIT from changing
+# a running system with which it is not compatible. These values are checked
+# directly from the file config.sh in the *CONFIG_PATH folder. The *grep
+# utility is used since it supports pattern matching. The CONFIG_VERSION has
+# 3 fields: version.revision.level. 'version' is the configuration version;
+# this must be an exact match. 'revision' is the major revision; this must be
+# an exact match. 'level' is the cycle number within the revsion; matching on
+# this field is left to the individual system. The local enviroment variable
+# *sysedit_version is set immediately on entry, and will be modified whenever
+# SYSEDIT is changed.
+#
+# LibreCalc/LibreOffice operations are no longer performed by SYSEDIT.
+#
+# Wishlist.
+# 	Add "revert" option to revert to last change
+# P1=<option>, P2=<shell-name>
+sysedit_version=2.3.3
+echo "SYSEDITv3 $sysedit_version initiated."
+P1=$1
+P2=$2
+# check *sysedit_version against configuration.
+if [ -z "$CONFIG_PATH" ];then
+ echo "** SYSEDITv3 abandoned - *CONFIG_PATH not set. **"
+ read -p "Enter ctrl-c to remain in Terminal: "
+ exit 1
+fi
+if ! test -f $CONFIG_PATH/config.sh;then
+ echo "** SYSEDITv3 abandoned - config.sh missing. **"
+ read -p "Enter ctrl-c to remain in Terminal: "
+ exit 1
+fi
+# check OS_VERSION and CONFIG_VERSION for compatibility.
+config_fnpath=$CONFIG_PATH/config.sh
+grep -e "CONFIG_VERSION=2.3" $config_fnpath
+if [ $? -ne 0 ];then
+ echo "** SYSEDIT abandoned - system configuration incompatible. **"
+ echo " expecting 2.3.x .. config is $CONFIG_VERSION"
+ read -p "Enter ctrl-c to remain in Terminal: "
+ exit 1
+fi
+grep -e "Machine" $config_fnpath
+if [ $? -ne 0 ];then
+ echo "** SYSEDIT abandoned - system configuration incompatible. **"
+ echo " expecting 'Machine' config is $CONFIG_PATH"
+ read -p "Enter ctrl-c to remain in Terminal: "
+ exit 1
+fi
+isChrome=0
+if [[ "$OS_VERSION" =~ chromeos ]];then
+ isChrome=1
+fi
+isDone=0
+case $- in
+    *i*) isInteractive=1;;
+      *) isInteractive=0;;
+esac
+if [[ "$SYS_VERSION" =~ ubuntu.* ]];then
+ echo "  SYSEDITv3 $sysedit_version compatibility check complete."
+else
+ echo "** SYSEDITv3 version $sysedit_version not compatible with running system. **"
+ echo " expected system version ~ /ubuntu.*/"
+ echo " actual version '$SYS_VERSION'"
+ if [ $isInteractive -ne 0 ];then
+  echo "** SYSEDITv3 $sysedit_version attempted on incompatible system. **"
+  echo "  SYSEDITv3 $sysedit_version terminating."
+  printf "%s%s\n" "$(date +%T)"  "** SYSEDITv3 $sysedit_version $P1 $P2 failed. **" >> $system_log
+  printf "%s%s\n" "$(date +%T)"  " ** SYSEDITv3 $sysedit_version incompatible with $SYS_VERSION **" >> $system_log
+  read -p "Enter ctrl-c to remain in Terminal: "
+  exit 1
+ else
+  printf "%s%s\n" "$(date +%T)"  "** SYSEDITv3 $sysedit_version $P1 $P2 failed. **" >> $system_log
+  printf "%s%s\n" "$(date +%T)"  " ** SYSEDITv3 $sysedit_version incompatible with $SYS_VERSION **" >> $system_log
+  exit 1
+ fi
+fi		# incompatible version
+if [ "$USER" != "ubuntu" ];then
+ if [ $isInteractive -ne 0 ];then
+  echo "** SYSEDITv3 $sysedit_version attempted on unrecognized system. **"
+  echo "  SYSEDITv3 $sysedit_version terminating."
+  read -p "Enter ctrl-c to remain in Terminal: "
+  exit 1
+ else
+  printf "%s%s\n" $(date +%T)"  ** SYSEDITv3 $sysedit_version $P1 $P2 failed. **" >> $system_log
+  exit 0
+ fi
+fi
+
+# this is non-persistent ubuntu ALWAYS export *folderbase.
+export folderbase=/media/ubuntu/Windows
+
+export gitpath=$folderbase/GitHub
+if [ -z "$system_log" ]; then
+  export system_log=$WINUBUNTU_PATH/SystemLog.txt
+fi
+touch $system_log #
+sysedit_mode=$P1
+sysedit_mode=${sysedit_mode,,}
+sysedit_proc=$P2
+if [ "$sysedit_proc" != "LOGMSG" ];then 
+ syslogging=1
+ printf "%s%s\n" "$(date +%T) " "  SYSEDITv3 $sysedit_version initiated." >> $system_log
+else
+ syslogging=0
+fi
+echo "  SYSEDITv3 $sysedit_version initiated."
+if [ -z "$sysedit_mode" ]; then
+  printf "%s%s\n" "$(date +%T) " \
+   "No SYSEDITv3 mode specified. SYSEDITv3 $sysedit_version abandoned." >> $system_log
+  echo "  No SYSEDITv3 mode specified. SYSEDITv3 $sysedit_version abandoned."
+  read -p "Press ctrl-c to complete exit without dropping Terminal...: "
+  exit 1
+fi
+case $sysedit_mode in
+"version" | "--version")
+ echo "SYSEDITv3 Version = $sysedit_version"
+ isDone=1
+  ;;
+"help" | "--help")
+#################### help ##########################
+ x-www-browser 'file:///media/ubuntu/Windows/GitHub/TerritoriesCB/FLsara86777/Projects-Geany/DocumentationCB/SYSEDIT.html'
+   isdone=1
+   ;;
+"sysedit")
+#################### sysedit #######################
+ printf "%s%s\n" "$(date + %T) " "  SYSEDITv3 $sysedit_version mode = '$sysedit_mode'" >> $system_log
+ printf "%s\n" "   Cannot SYSEDITv3 itself - abandoned." >> $system_log
+    echo "  SYSEDITv3 $sysedit_version mode = '$sysedit_mode' "
+    echo "SYSEDITv3 will clobber itself while running..."
+    echo "Run NewSYSEDIT bash script to update SYSEDITv3"
+  read -p "Press ctrl-c to complete exit without dropping Terminal...: "
+  exit 1
+  ;;
+"librecalc" | "libreoffice")
+##################### libreoffice/calc ###########################
+  if [ $isChrome -ne 0 ];then
+   printf "%s%s\n" "  SYSEDITv3 $sysedit_version Cannot update LibreOffice on Chromebook.. Use Chrome - abandoned." \
+    >> $system_log
+   echo "  SYSEDITv3 $sysedit_version Cannot update LibreOffice on Chromebook.. Use Chrome - abandoned."
+   read -p "Press ctrl-c to remain in Terminal...: "
+   exit 1
+  fi
+    $HOME/sysprocs/LOGMSG "  Updating LibreOffice MyDocuments Libraries..."
+    echo "  Updating LibreOffice MyDocuments Libraries..."
+    if [ 1 -eq 1 ]; then
+#       echo "  SYSEDITv3 $sysedit_version $sysedit_mode - Ignored (not implemented)" >> $system_log #
+       $HOME/sysprocs/LOGMSG "  SYSEDITv3 $sysedit_version $sysedit_mode - Ignored (not implemented)"
+       echo "  SYSEDITv3 $sysedit_version $sysedit_mode - Ignored (not implemented)"
+       echo "  Use LibreOffice/Tools/Macros/Organize Macros/Organizer/Libraries/Import"
+       echo "  Do the following from any Calc spreadsheet..."
+       echo "Tools/Options/LibreOffice/Security Macros enable with user approval"
+       echo "Tools/Macros/Organize Macros/Libre Basic/Organizer/Libraries"
+       echo "  Import/BadAss from '$'gitpath/Libraries-Project/BadAss"
+       echo "  Import/Banking-Basics from above"
+       echo "  Import/XrayTool from above"
+       echo "  Use Geany to get DayName.bas code, then move to"
+       echo "  Tools/Macros/Edit Macros/Standard/Module1 and insert DayName.bas code"
+       echo "    after Main"
+       echo "  Tools/Customize/Keyboard Load alpha.cfg"
+       echo "  Tools/Macros/Edit Macros/BadAss Module1/main, ensure DEC2=123 LibreCalc"
+       echo "     or DEC2=118 OpenOffice and also in Module2 dialog recording subs"
+       echo "  Tools/Options/LibreCalc/General move right on 'enter' "
+       read -p "Press Enter to continue..."
+    else
+#      copy $gitpath/Libraries-Project/BadAss to $CALC_LIB_PATH
+    echo "  copying BadAss library.." >> $system_log #
+    $HOME/sysprocs/LOGMSG "  copying BadAss library.."
+    echo "  copying BadAss library.."
+    cp -pru $gitpath/Libraries-Project/BadAss  $CALC_LIB_PATH
+#      copy $gitpath/Libraries-Project/XRay to $CALC_LIB_PATH
+#    echo "  copying XRayTool library.." >> $system_log #
+    $HOME/sysprocs/LOGMSG "  copying XRayTool library.."
+    echo "  copying XrayTool library.."
+    cp -pru $gitpath/Libraries-Project/XrayTool  $CALC_LIB_PATH
+#      copy file $gitpath/Libraries-Project/u_script.xlc to $CALC_LIB_PATH/script.xlc
+#      copy file $gitpath/Libraries-Project/u_dialog.xlc to $CALC_LIB_PATH/dialog.xlc
+    echo "  updating MyDocuments library definitions.." >> $system_log #
+ bash $HOME/sysprocs/LOGMSG "  copying MyDocuments library definitions.."
+    echo "  updating MyDocuments library definitions.."
+    cp -pu $gitpath/Libraries-Project/u_script.xlc  $CALC_LIB_PATH/script.xlc
+    cp -pu $gitpath/Libraries-Project/u_dialog.xlc  $CALC_LIB_PATH/dialog.xlc
+#      copy file $gitpath/Libraries-Project/Standard/Module1.xba to
+#            $CALC_LIB_PATH/Standard
+#    echo "  copying Standard/Module1.." >> $system_log #
+ bash $HOME/sysprocs/LOGMSG "  copying Standard/Module1..."
+    echo "  copying Standard/Module1.."
+#  cp -pu $gitpath/Libraries-Project/Standard/Module1.xba $CALC_LIB_PATH/Standard/Module1.xba
+#    date +%T >> $system_log #
+#   echo "  SYSEDITv3 $sysedit_version complete." >> $system_log 
+    echo "  SYSEDITv3 $sysedit_version complete."
+    $HOME/sysprocs/LOGMSG "  SYSEDITv3 $sysedit_version complete."
+    echo  -e "If LibreOffice/LibreCalc is running, close/exit "
+    echo " and re-open to pick up changes."
+  fi # end skip-around conditional
+# isDone=1 - normal exit   jumpto NormalExit
+  isDone=1
+  ;;
+"bash")
+################## bash ##############################
+  printf "%s%s\n" "$(date +%T) " "  SYSEDITv3 $sysedit_version mode = '$sysedit_mode'" >> $system_log
+  printf "%s\n" "   updating ~/.bashrc." >> $system_log
+    echo "  SYSEDITv3 $sysedit_version mode = '$sysedit_mode' "
+    echo "  updating ~/.bashrc... from .bashrc.v3.$SYSID"
+    cp -pu $gitpath/VersionControl/.bashrc.v3.$SYSID ~/.bashrc
+    if test -f $gitpath/VersionControl/.bash_aliases.v3.$SYSID;then
+     cp -pu $gitpath/VersionControl/.bash_aliases.v3.$SYSID ~/.bash_aliases
+    fi
+#    echo "  updating $gitpath/sysstart/.bashrc..." >> $system_log
+# bash $HOME/sysprocs/LOGMSG "  updating $WINUBUNTU_PATH/sysstart/.bashrc..."
+     echo "  updating $WINUBUNTU_PATH/sysstart/.bashrc.v3..."
+   printf "%s%s\n" "$(date +%T) " "  updating $WINUBUNTU_PATH/sysstart/.bashrc.v3."\
+    >> $system_log
+     cp -pu $gitpath/VersionControl/.bashrc.v3.$SYSID $WINUBUNTU_PATH/sysstart
+     echo "  updating ~/sysstart/.bashrc from .bashrc.v3..."
+     if test -f $gitpath/VersionControl/.bash_aliases.v3.$SYSID;then
+      cp -pu $gitpath/VersionControl/.bash_aliases.v3.$SYSID $WINUBUNTU_PATH/sysstart
+     fi
+   printf "%s%s\n" "$(date +%T) "  "  SYSEDITv3 $sysedit_version complete."
+    echo "  SYSEDITv3 $sysedit_version complete."
+    echo "  exit and restart Terminal to pick up changes..."
+    read -p "Press ctrl-c to complete exit without dropping Terminal...: "
+    exit 0
+  isDone=1
+  ;;
+"config")
+######################### config ############################
+  # SYSEDITv3 config <type> [--revert]
+  echo "** WARNING: You are about to change the running system configuration..**"
+  echo " This may have the undesired affect of disabling SYSEDITs "
+  read -p " OK to continue (y/n)? "
+  yn=${REPLY^^}
+  if [ "$yn" != "Y" ];then
+   echo "SYSEDITv3 $sysedit_version exiting at user request."
+   echo "  System configuration unchanged."
+   read -p "Enter ctrl-c to remain in Terminal: "
+   exit 0
+  fi
+  type=${P2,,}
+  if [ -z "$P2" ];then
+   echo "SYSEDITv3 config mach|terr|acct [--revert] missing parameter(s) - abandoned."
+   exit 1
+  fi
+  if [ "$P2" != "mach" ] && [ "$P2" != "terr" ] && [ "$P2" != "acct" ];then
+   echo "SYSEDITv3 config mach|terr|acct [--revert] unrecognized '$P2' - abandoned."
+   exit 1
+  fi
+  option=${P3,,}
+  if [ ! -z "$option" ] && [ "$option" != "--revert" ];then
+   echo "** SYSEDITv3 config mach|terr|acct [--revert] unrecognized '$option' - exiting."
+   exit 1
+  fi
+  dorevert=0
+  if [ "$option" == "--revert" ];then
+   dorevert=1
+  fi
+  pushd ./ > /dev/null
+ case "$P2" in
+  "mach")
+    if [ $dorevert -ne 0 ];then
+     if ! test $CONFIG_PATH/Machine/config.sh.sav;then
+      echo "** SYSEDITv3 config mach --revert - no prior configuration to revert to.**"
+      exit 1
+     fi
+     cp -pv ~/.config/Machine/config.sh.sav $WINUBUNTU_PATH/sysstart/config.sh
+     cp -pv ~/.config/Machine/config.sh.sav ~/.config/Machine/config.sh
+     rm -v ~/.config/Machine/config.sh.sav
+     echo "  Machine configuration revert complete."
+    else		# not revert
+     pushd ./ > /dev/null
+     # get latest terr.CB1.<version> config.sh file.
+     cd $folderbase/Machine/MachVersion
+     git br > $TEMP_PATH/branches.txt
+     grep -e "^\*.*HPPavilion2" $TEMP_PATH/branches.txt > /dev/null
+     if [ $? -ne 0 ];then
+      git co HPPavilion2
+     fi
+     if test -f $TEMP_PATH/latestconfig.txt;then rm $TEMP_PATH/latestconfig.txt;fi
+     printf "%s\n" "PWD = '$PWD'"
+     printf "%s\n" "line 383 GetLatestCfg.sh"
+     . ./GetLatestCfg.sh > $TEMP_PATH/latestconfig.txt
+     if ! test -s $TEMP_PATH/latestconfig.txt;then
+      printf "%s\n" " ** in 'config mach' line 387 empty *t/latestconfig.txt - exiting."
+      exit 1 
+     fi
+     mawk '{if( $1 ~ /[0-9].*/){print "#!/bin/bash";print "machver=" $1};}' \
+      $TEMP_PATH/latestconfig.txt > $TEMP_PATH/configmach.sh
+    chmod +x $TEMP_PATH/configmach.sh
+    . $TEMP_PATH/configmach.sh	# sets *machver environment var
+    cd ~/.config
+    if ! test -d Machine;then
+     echo "  Creating .config/Machine.."
+     mkdir Machine
+    fi
+    if test -f ~/.config/Machine/config.sh;then
+     cp -pv ~/.config/Machine/config.sh  ~/.config/Machine/config.sh.sav
+    fi
+    echo "  Updating running configuration.."
+    cp -pv $folderbase/Machine/MachVersion/config.sh.HP2.mach.$machver \
+     $WINUBUNTU_PATH/sysstart
+    cp -pv $folderbase/Machine/MachVersion/config.sh.HP2.mach.$machver \
+     ~/.config/Machine
+    cp -pv $folderbase/Machine/MachVersion/config.sh.HP2.mach.$machver \
+     ~/.config/Machine/config.sh
+    popd > /dev/null
+    echo "  Machine configuration update complete."
+    read -p "Do you with to change the running Terminal machine configuration (Y/N)? "
+    yn=${REPLY^^}
+    if [ "$yn" == "Y" ];then
+     echo "re-initializing Terminal machine configuration.."
+     . $CONFIG_PATH/Machine/config.sh
+     ~/sysprocs/lsconfig.sh mach
+    else
+     echo "  Restart Terminal session for changes to take effect."
+    fi
+  fi	# end dorevert
+  ;;
+  "terr")
+  if [ $dorevert -ne 0 ];then
+   if ! test $APPCONFIG_PATH/config.sh.sav;then
+    echo "** SYSEDITv3 config --revert - no prior configuration to revert to.**"
+    exit 1
+   fi
+   cp -pv $APPCONFIG_PATH/config.sh.sav $WINUBUNTU_PATH/sysstart/config.sh
+   cp -pv $APPCONFIG_PATH/config.sh.sav $APPCONFIG_PATH/config.sh
+   rm -v $APPCONFIG_PATH/config.sh.sav
+   echo "  Configuration revert complete."
+  else		# not revert
+   cd $HOME/.config
+   if ! test -d Territories;then
+    echo "  Creating .config/Territories.."
+    mkdir Territories
+    touch Territories/config.sh		# empty config.sh for .sav below
+   fi
+   cd Territories
+   cp -pv config.sh config.sh.sav
+   echo "  Updating running configuration.."
+    pushd ./ > /dev/null
+    # get latest terr.HP2.<version> config.sh file.
+    cd $git_path/TerrVersion
+    git br > $TEMP_PATH/branches.txt
+    grep -e "^\*.*HPPavilion2" $TEMP_PATH/branches.txt > /dev/null
+    if [ $? -ne 0 ];then
+     git co HPPavilion2
+    fi
+    printf "%s\n" "line 441 GetLatestCfg.sh.."
+    . $git_path/TerrVersion/GetLatestCfg.sh
+#    . $git_path/TerrVersion/GetLatestCfg.sh > $TEMP_PATH/latestconfig.txt
+#    mawk '{if( $1 ~ /[0-9].*/){print "#!/bin/bash";print "configver=" $1};}' $TEMP_PATH/latestconfig.txt > $TEMP_PATH/configname.sh
+#    chmod +x $TEMP_PATH/configname.sh
+#    . $TEMP_PATH/configname.sh	# sets *terrcfg environment var
+    cp -pv $APPCONFIG_PATH/config.sh config.sh.sav
+#   cp -pv $crmgit_path/ShellFiles/config.sh $WINUBUNTU_PATH/sysstart
+#   cp -pv $crmgit_path/ShellFiles/config.sh /home/$USER/.config/Territories
+   cp -pv $WINGIT_PATH/TerrVersion/config.sh.HP2.terr.$terrcfg \
+    $WINUBUNTU_PATH/sysstart
+   cp -pv $WINGIT_PATH/TerrVersion/config.sh.HP2.terr.$terrcfg \
+    $APPCONFIG_PATH
+   cp -pv $HOME/.config/Territories/config.sh.HP2.terr.$terrcfg \
+    $APPCONFIG_PATH/config.sh
+   echo "  Territories configuration update complete."
+   echo "  Restart Terminal session for changes to take effect."
+  fi	# end dorevert
+  ;;
+ esac
+  popd > /dev/null
+  isDone=1
+  ;;
+"rucycle")
+######################### rucycle ###########################
+# update config.sh/export RU_BUILD=2.0.0 from RUCycle.txt
+  echo "** SYSEDIT rucycle deprecated - use SYEDIT terr to update Territories RU_BUILD **"
+  isDone=1
+ if [ 1 -eq 0 ];then
+ # ----------------------deprecated block----------------------------
+# 6/3/25.	wmk.	(automated) Modification History lines dated.
+  pushd ./ > /dev/null
+  cd $HOME/.config/Territories
+  mawk \
+  'BEGIN{getline < "RUCycle.txt";nxtcycle=$1}/RU_BUILD=/{printf("%s%s%s%s\n", $1, " ", substr($2,1,length($2)-1), nxtcycle)};{if (substr($2,1,8) != "RU_BUILD")print;;}' \
+   $HOME/.config/Territories/config.sh > $TEMP_PATH/newconfig.sh
+  sed -i '2d' $TEMP_PATH/newconfig.sh
+  sed -i "1a#\t$(date +%m/%d/%y.)\twmk." $TEMP_PATH/newconfig.sh
+  oldbuild=$RU_BUILD
+  cp -pv $TEMP_PATH/newconfig.sh ./config.sh
+  chmod +x ./config.sh
+  . ./config.sh
+  if [ $? -eq 0 ];then
+   echo "** running system configuration updated **"
+   isDone=1
+  fi
+  read -p "Do you wish to make this change permanent (y/n)? "
+  yn=${REPLY^^}
+  if [ $yn == "Y" ];then
+   cp -pv ./config.sh $crmgit_path/ShellFiles
+   cp -pv ./config.sh $WINUBUNTU_PATH/sysstart
+   cd $pathbase/$rupath
+   if test -f Build.$oldbuild;then rm Build.$oldbuild;fi
+   printf "%s%s\n" "Build." "$RU_BUILD" > Build.$RU_BUILD
+  fi
+  popd > /dev/null
+# ----------------------deprecated block----------------------------
+# 6/3/25.	wmk.	(automated) Modification History lines dated.
+fi
+  ;;
+"sccycle")
+######################### sccycle ###########################
+  echo "** SYSEDIT sccycle deprecated - use SYSEDIT terr to update Territories SC_BUILD **"
+  isDone=1
+ if [ 1 -eq 0 ];then
+ # ------------------deprecated block-------------------------
+# 6/3/25.	wmk.	(automated) Modification History lines dated.
+  pushd ./ > /dev/null
+  cd $HOME/.config/Territories
+  mawk \
+  'BEGIN{getline < "SCCycle.txt";nxtcycle=$1}/SC_BUILD=/{printf("%s%s%s%s\n", $1, " ", substr($2,1,length($2)-1), nxtcycle)};{if (substr($2,1,8) != "SC_BUILD")print;;}' \
+   $HOME/.config/Territories/config.sh > $TEMP_PATH/newconfig.sh
+  sed -i '2d' $TEMP_PATH/newconfig.sh
+  sed -i "1a#\t$(date +%m/%d/%y.)\twmk." $TEMP_PATH/newconfig.sh
+  oldbuild=$SC_BUILD
+  cp -pv $TEMP_PATH/newconfig.sh ./config.sh
+  chmod +x ./config.sh
+  . ./config.sh
+  if [ $? -eq 0 ];then
+   echo "** running system configuration updated **"
+   isDone=1
+  fi
+  read -p "Do you wish to make this change permanent (y/n)? "
+  yn=${REPLY^^}
+  if [ $yn == "Y" ];then
+   cp -pv ./config.sh $crmgit_path/ShellFiles
+   cp -pv ./config.sh $WINUBUNTU_PATH/sysstart
+   cd $pathbase/$scpath
+   if test -f Build.$oldbuild;then rm Build.$oldbuild;fi
+   printf "%s%s\n" "Build." "$SC_BUILD" > Build.$SC_BUILD
+  fi
+  popd > /dev/null
+# ------------------deprecated block-------------------------
+# 6/3/25.	wmk.	(automated) Modification History lines dated.
+fi
+  ;;
+"srccycle")
+######################### sccycle ###########################
+# update config.sh/export SRC_BUILD=2.2.1 from SRCCycle.txt
+  pushd ./ > /dev/null
+  cd $HOME/.config/Territories
+  mawk \
+  'BEGIN{getline < "SRCCycle.txt";nxtcycle=$1}/SRC_BUILD=/{printf("%s%s%s%s\n", $1, " ", substr($2,1,length($2)-1), nxtcycle)};{if (substr($2,1,8) != "SRC_BUILD")print;;}' \
+   $HOME/.config/Territories/config.sh > $TEMP_PATH/newconfig.sh
+  sed -i '2d' $TEMP_PATH/newconfig.sh
+  sed -i "1a#\t$(date +%m/%d/%y.)\twmk." $TEMP_PATH/newconfig.sh
+  oldbuild=$SRC_BUILD
+  cp -pv $TEMP_PATH/newconfig.sh ./config.sh
+  chmod +x ./config.sh
+  . ./config.sh
+  if [ $? -eq 0 ];then
+   echo "** running system configuration updated **"
+   isDone=1
+  fi
+  read -p "Do you wish to make this change permanent (y/n)? "
+  yn=${REPLY^^}
+  if [ $yn == "Y" ];then
+   cp -pv ./config.sh $crmgit_path/ShellFiles
+   cp -pv ./config.sh $WINUBUNTU_PATH/sysstart
+   cd $codebase
+   if test -f Build.$oldbuild;then rm Build.$oldbuild;fi
+   printf "%s%s\n" "Build." "$SRC_BUILD" > Build.$SRC_BUILD
+  fi
+  popd > /dev/null
+  ;;
+"proc")
+######################### proc ##############################
+	# check if syseditproc is LOGMSG.
+    syslogging=1
+    if [ "${sysedit_proc,,}" == "logmsg" ];then
+	 syslogging=0
+	fi
+	if [ $syslogging -ne 0 ];then \
+    printf "%s%s\n" "$(date +%T) "  "  SYSEDITv3 $sysedit_version mode = '$sysedit_mode' " >> $system_log;fi
+    # copy proc to running $HOME/sysprocs and WINUBUNTU_PATH/sysprocs
+    if [ -z "$sysedit_proc" ]; then
+#     echo "  SYSEDITv3 $sysedit_version - proc filename not specified." >> $system_log #
+#     echo "  SYSEDITv3 $sysedit_version abandoned." >> $system_log #
+     if [ $syslogging -ne 0 ];then \
+     printf "%s%s\n" "$(date +%T) " "  SYSEDITv3 $sysedit_version - proc filename not specified."
+     printf "%s\n" "   SYSEDITv3 $sysedit_version abandoned.";fi
+     echo "  SYSEDITv3 $sysedit_version - proc filename not specified."
+     echo "  SYSEDITv3 $sysedit_version abandoned."
+     read -p "Press ctrl-c to complete exit without dropping Terminal...: "
+     exit 1
+    fi  # end file not specified conditional
+    if [ ${sysedit_proc,,} == "sysedit" ]; then
+     printf "%s%s\n" "$(date +%T) "  "  SYSEDITv3 $sysedit_version PROC = '$sysedit_proc'" >> $system_log
+     printf "%s\n"  "     Cannot SYSEDITv3 itself - abandoned." >> $system_log
+     echo "  SYSEDITv3 $sysedit_version PROC = '$sysedit_proc' "
+     echo "SYSEDITv3 $sysedit_version will clobber itself while running..."
+     echo "Run NewSYSEDIT bash script to update SYSEDITv3 $sysedit_version"
+     read -p "Press ctrl-c to complete exit without dropping Terminal...: "
+     exit 1
+    fi 
+    # copy proc to running $HOME/sysprocs and WINUBUNTU_PATH/sysprocs
+    cp -pu $gitpath/ShellFiles/$sysedit_proc $WINUBUNTU_PATH/sysprocs
+	cp -pu $WINUBUNTU_PATH/sysprocs/$sysedit_proc $HOME/sysprocs
+    if [ $? -eq 0 ]; then
+#      echo "    $sysedit_proc updated." >> $system_log #
+	 if [ $syslogging -ne 0 ];then \
+      printf "%s%s\n" "$(date +%T) "  "    $sysedit_proc updated." >> $system_log;fi
+      echo "    $sysedit_proc updated." 
+     else
+#      echo "  Error copying proc to target - SYSEDITv3 $sysedit_version failed." >>$system_log #
+      if [ $syslogging -ne 0 ];then \
+       printf "%s%s\n" "$(date +%T) "  "  Error copying $sysedit_proc to target - SYSEDITv3 $sysedit_version failed."\
+        >> $system_log;fi
+       echo "  Error copying proc to target - SYSEDITv3 $sysedit_version failed."
+     fi   # end copy error conditional 
+    if [ $isInteractive -ne 0 ];then  
+     read -p "Press ctrl-c to complete exit without dropping Terminal...: "
+     exit 0
+    fi
+# isDone=1 - normal exit   jumpto NormalExit
+  isDone=1;;
+  "start")
+####################### start ############################
+  if [ $isChrome -ne 0 ];then
+   echo "  sysedit Cannot update sysstart on Chromebook.. - abandoned."
+   read -p "Press ctrl-c to complete exit without dropping Terminal...: "
+   exit 1
+  fi
+  printf "%s%s\n" "$(date +%T) "  "  SYSEDITv3 $sysedit_version mode = '$sysedit_mode' "
+    # copy proc to running ~/sysstart and WINUBUNTU_PATH/sysstart
+    if [ -z "$sysedit_proc" ]; then
+ #     echo "  SYSEDITv3 $sysedit_version - proc filename not specified." >> $system_log #
+ #     echo "  SYSEDITv3 $sysedit_version abandoned." >> $system_log #
+     printf "%s%s\n" "$(date +%T) "  "  SYSEDITv3 $sysedit_version - proc filename not specified.\n  SYSEDITv3 $sysedit_version abandoned."
+     echo "  SYSEDITv3 $sysedit_version - proc filename not specified."
+     echo "  SYSEDITv3 $sysedit_version abandoned."
+     read -p "Press ctrl-c to complete exit without dropping Terminal...: "
+     exit 1
+    fi  # end file not specified conditional 
+    # copy proc to running $HOME/sysprocs and WINUBUNTU_PATH/sysstart
+    cp -pu $gitpath/ShellFiles/$sysedit_proc ~/sysstart
+    cp -pu $gitpath/ShellFiles/$sysedit_proc $WINUBUNTU_PATH/sysstart
+    if [ $? -eq 0 ]; then
+#      echo "    $2 updated." >> $system_log #
+     printf "%s%s\n" "$(date +%T) "  "    $sysedit_proc updated." >> $system_log
+     echo "    $sysedit_proc updated." 
+    else
+#      echo "  Error copying proc to target - SYSEDITv3 $sysedit_version failed." >>$system_log #
+     printf "%s%s\n" "$(date +%T) "  "  Error copying proc to target - SYSEDITv3 $sysedit_version failed."
+      echo "  Error copying proc to target - SYSEDITv3 $sysedit_version failed."
+    fi   # end no copy error conditional   
+    read -p "Press ctrl-c to complete exit without dropping Terminal...: "
+    exit 0
+# isDone=1 - normal exit   jumpto NormalExit
+  isDone=1
+  ;;
+  *)
+########## unrecognized mode ######################
+    printf "%s%s\n" "$(date +%T) "  "**  Unrecognized SYSEDITv3 $sysedit_version mode $sysedit_mode" >> $system_log
+    printf "%s\n" "    SYSEDITv3 $sysedit_version abandoned." >> $system_log
+    echo "  ** Unrecognized SYSEDITv3 $sysedit_version mode '$sysedit_mode' "
+    echo "  SYSEDITv3 $sysedit_version abandoned."
+    isDone=0
+esac     # end case
+#read -p "SYSEDITv3 $sysedit_version stubbed for now... Press Enter to continue..."
+if [ $isDone -eq 1 ];then
+ if [ $syslogging -ne 0 ];then \
+ printf "%s%s\n" "$(date +%T) "  "  SYSEDITv3 $sysedit_version complete." \
+   >> $system_log;fi
+ echo "  SYSEDITv3 $sysedit_version complete." 
+else
+ echo "SYSEDITv3 $sysedit_version abnormal termination.."
+fi
+# end SYSEDIT

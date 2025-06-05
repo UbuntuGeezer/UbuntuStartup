@@ -1,0 +1,122 @@
+#!/bin/bash
+# COLDSTARTv3_1.HP2 - bash shell to be run after COLDSTARTv3 has completed.
+#	6/3/25.	wmk.	14:08
+#
+# Usage. bash   COLDSTARTv3_1
+#
+# Entry. System time set to Eastern time
+#	Initialize System Log file
+#	System log message issued with date/time stamp 
+#	Configuration files copied to $HOME
+#	System startup procedures copied to $HOME/startup
+#	System bash procedures copied to $HOME/sysprocs
+#	Terminal restart advised to pick up configuration files
+#
+# Exit. (COLDSTARTv3_1 complete)
+# 	  Touchpad disabled	
+#         Universe repository connected
+#	  [Special bash files with command aliases copied to $HOME\sysprocs]
+#	  Install git
+#	  Install Geany
+#	  Install Zoom
+#	  Install Java JRE/JDK
+#	  Install FlowBlade
+#	  Install testdisk
+#	  Install Python
+#     Install Bless (hex file editor)
+#     Install SQL Lite
+#	  Update Libre Office to ver. 6.4.6
+#     [Install wifi driver]
+#	  Remind user to copy WINUBUNTU/.ssh/id_rsa, id_rsa.pub to ~/.ssh
+#         and run ssh-agent add to register the current SSH keys
+#
+# Modification History.
+# --------------------
+# 6/3/25.	wmk.	(automated) Modification History sorted.
+# 6/3/25.	wmk.	dates added to all lines where missing.
+# 11/7/23.	wmk.	COLDSTARTv3_1; remove SYS_VERSION=, system_log=; set by
+# 11/7/23.	 Machine/config.sh.
+# 11/11/23.	wmk.	initial message corrected to ver 2.3.x.
+# 8/31/23.	wmk.	updated for cleaned up HP Pavilion; prompt user to wait for
+# 8/31/23.	 1Internet connection before proceeding; InstallBuild, InstallMarkdown
+# 8/31/23.	 2added to prompt list.
+# 9/1/23.	wmk.	Installgawk added to run list.
+# 9/4/23.	wmk.	ver2.0 distinction added.
+# 9/5/23.	wmk.	*SYS_VERSION set and displayed.
+# 9/16/23.	wmk.	*SYS_VERSION test changed to
+# 9/16/23.	 ubuntu-18.04.3-LTS/Territories-ver2.x; *system_log corrected.
+# 10/7/23.	wmk.	name change to COLDSTARTv3_1.HP2 using *SYSID as part of
+# 10/7/23.	 1shell name; check *SYSID on startup; lsconfig.sh added to sysedits
+# 10/7/23.	 2list.
+# 7/21/20.	wmk.	original
+# 7/23/20.	wmk.	added testdisk and Python installs
+# 7/24/20.	wmk.	eliminated exit at end to save Terminal session; updated
+# 7/24/20.	 script to include SSH key installation and registration
+# 7/27/20.	wmk.	add hooks for Bless (hex editor), SQL Lite, and wifi
+# 7/27/20.	 driver installs
+# 7/30/20.	wmk.	add Installtcl and InstallFossil comments inline
+# 8/25/20.	wmk.	add UpdateLibre to update LibreOffice to ver 6.4.6
+# 1/31/21.	wmk.	UpdateLibre maps to update to LibreOffice 6.4.7; sysedits
+# 1/31/21.	 invoked prior to Install procs
+# 3/22/21.	wmk.	systemlog properly set if not previously set; log messages
+# 3/22/21.	 consolidated with time stamp.
+# 6/15/21.	wmk.	documentation; code improvements; persistent Ubuntu
+# 6/15/21.	 detection/ignore.
+# 12/31/21.	wmk.	replace HOME with USER in host test.
+#endmods
+# check if running on persistent system..
+if [ "$USER" != "ubuntu" ]; then
+ echo "  COLDSTARTv3_1.HP2 attempted on persistent system - abandoned."
+ exit 0
+fi
+if [ "$SYS_VERSION" != "ubuntu-Version-18.0.4" ];then
+ echo "*** System version mismatch - expecting 'ubuntu-Version-18.0.4' ***"
+ echo " System version = '$SYS_VERSION'"
+ read -p " COLDSTARTv3_1.HP2 exiting... enter ctrl-c to remain in Terminal: "
+ exit 1
+fi
+if [ "$SYSID" != "HP2" ];then
+ echo "*** System ID mismatch - expecting 'HP2' ***"
+ echo " System ID = '$SYSID'"
+ read -p " COLDSTARTv3_1.HP2 exiting... enter ctrl-c to remain in Terminal: "
+ exit 1
+fi
+echo "** COLSTARTv3_1.HP2 for ver 2.3.x system **"
+echo " If you wish to coldstart for ver 2.1.x or 2.2.x reboot and run COLDSTARTv1_1..."
+#date +%F.%H.%M.%S | sed 's/$/ System COLDSTARTv3_1 initiated. &/' >> $system_log #
+printf "%s%s\n" "$(date +%F.%H.%M.%S.)" " System COLDSTARTv3_1.HP2 initiated." >> $system_log
+echo "  System COLDSTARTv3_1.HP2 initiated."
+read -p "Waiting for Internet connection... Press Enter to proceed: "
+# connect universe repository
+date +%T >> $system_log #
+echo "  Connecting universe repository..." >> $system_log #
+date +%F.%H.%M.%S | sed 's/$/  Connecting universe repository... &/' >> $system_log #
+echo "  Connecting universe repository..."
+sudo apt update
+sudo add-apt-repository universe
+# install packages for standard system operations using sysprocs
+# and aliases defined in ~/.bashrc
+echo "now run the following..."
+echo "sysedits"     # SYSEDIT all install packages
+echo "InstallTPadI"
+echo "Installgit"
+echo "InstallGeany"
+echo "#InstallZoom"
+echo "InstallJRE"
+echo "#InstallFlowBlade"
+echo "#Installtestdisk"
+echo "#InstallPython"
+echo "#InstallBless"
+echo "UpdateLibre"
+echo "Installgawk"
+echo "InstallSQL"
+echo "InstallBuild"
+echo "InstallMarkdown"
+echo "# InstallWifi"
+echo "# Installtcl # for sqlite build"
+# InstallFossil # for sqlite source code management
+#date +%F.%H.%M.%S | sed 's/$/  COLDSTART_1 Complete. &/' >> $system_log #
+printf "%s%s\n" "$(date +%F.%H.%M.%S.)" "  COLDSTARTv3_1.HP2 Complete." >> $system_log
+echo "SYSID = '$SYSID'"
+echo "SYS_VERSION = '$SYS_VERSION'"
+echo "  COLDSTARTv3_1.HP2 Complete."

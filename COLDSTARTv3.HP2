@@ -1,0 +1,195 @@
+#!/bin/bash
+# COLDSTARTv3.HP2 - bash shell for ver 3.x.x to be run after HP2 hard reset of system.
+#	6/3/25.	wmk.	12:20
+#
+# Usage. bash  COLDSTARTv3.HP2
+#
+# Entry. environment var startup_src set in .bashrc
+#
+# Exit. SYS_VERSION=ubuntu-18.0.4/Territories-ver2.x
+#	System time set to Eastern time
+#	Initialize System Log file
+#	System log message issued with date/time stamp 
+#       Create $TEMP_PATH directory ~/temp
+#	Configuration files copied to $HOME
+#	System startup procedures copied to $HOME/startup
+#	System bash procedures copied to ~/sysprocs
+#	Terminal restart advised to pick up configuration files
+#	Run COLDSTART_1
+# 	  Touchpad disabled	
+#         Universe repository connected
+#	  Special bash files with command aliases copied to $HOME
+#	  Install git
+#	  Install Geany
+#	  Install Zoom
+#	  Install Java JDK
+#	  Install FlowBlade
+#     Install testdisk
+#	  Install Python
+#     Install Bless (hex file editor)
+#     Install SQL Lite
+#     [Install wifi driver]
+#	  Remind user to copy WINUBUNTU/.ssh/id_rsa, id_rsa.pub to ~/.ssh
+#         and run ssh-agent add to register the current SSH keys
+#
+# Modification History.
+# --------------------
+# 6/3/25.	wmk.	(automated) Modification History sorted.
+# 6/2/25.	wmk.	dates added to all Modification History lines for sorting.
+# 11/6/23.	wmk.	CONFIG_VERSION 2.3.x upgrade;
+# 11/6/23.	 ubuntu/sysstart/config.sh.HP2.mach copied to .config/Machine
+# 11/7/23.	wmk.	sysstart/config.sh.*SYSID.mach.v3 copied to
+# 11/7/23.	 .config/Machine/config.sh
+# 11/11/23.	wmk.	bug fixes, SYS_VERSION, copy > ./Machine; .bash files
+# 11/11/23.	 copied from startup_src instead of config_src.
+# 8/31/23.	wmk.	*USER used to determine system type; *system_log redirected
+# 8/31/23.	 1unconditionally to Windows/ubuntu; *startup_src reverted to
+# 8/31/23.	 2Windows/Users/Bill/ubuntu/sysstart; *sysproc_src changed to
+# 8/31/23.	 3Windows/Users/Bill/ubuntu/sysprocs; bug fixes in *system_log
+# 8/31/23.	 4messages.
+# 9/1/23.	wmk.	Installgawk added to copy list.
+# 9/2/23.	wmk.	StartupNote.txt processing added.
+# 9/4/23.	wmk.	ver2.x warning added; *startup_src set pointing to
+# 9/4/23.	 1*U-DISK/Windows/ubuntu/sysstart; SYS_VERSION environment
+# 9/4/23.	 2var set to 'ubuntu-18.0.4/Territories-ver2.x'.
+# 9/5/23.	wmk.	bug fix - *sysproc_src was pointing to Users/Bill..; eliminate
+# 9/5/23.	copy	SYSEDIT to /sysstart;
+# 9/6/23.	wmk.	ChangeSubsys.sh, ChangeTerr.sh added to sysprocs *cp list.
+# 9/16/23.	wmk.	SYS_VERSION constant changed to
+# 9/16/23.	 ubuntu-18.04.3-LTS/Territories-ver2.x; copy UpdateLibre7p5.sh to
+# 9/16/23.	 ~/sysprocs; idiot-proof /sysstart by copying literal COLDSTART*,
+# 9/16/23.	 SYSEDIT*, sysedits* files to eliminate confusion.
+# 10/4/23.	wmk.	SYSEDITv3 also copied to SYSEDIT in /sysprocs.
+# 10/7/23.	wmk.	config.sh.HP2 copied to *HOME/.config/Territories; *SYSID
+# 10/7/23.	 1set to HP2 to match *git_path/ChromeMods/MachineIDs.txt;
+# 10/7/23.	 2config.sh.*SYSID copied to *HOME/.config/Territories; *bash files
+# 10/7/23.	 3.bashrc.v3.*SYSID, .bash_aliases.v3.*SYSID copied to *HOME;
+# 10/7/23.	 4*CONFIG_PATH environment var set; SYSEDITv3.HP2 copied to
+# 10/7/23.	 5/sysprocs.
+# 6/6/22.	wmk.	.bash_aliases added to copy list.
+# 6/18/22.	wmk.	-p option added to *cp* commands.
+# 8/27/23.	wmk.	export *startup_src.
+# 7/20/20.	wmk.	original script.
+# 7/21/20.	wmk.	swapped out terminal_ for term_; testdisk utility
+# 7/21/20.	 added.
+# 7/23/20.	wmk.	moved term_, termx_ and SETBACK to $HOME/sysprocs; add
+# 7/23/20.	 InstallPython to COLDSTART_1 list
+# 7/24/20.	wmk.	code added to create $TEMP_PATH directory ~/temp
+# 7/30/20.	wmk.	documentation on InstallSQL
+# 8/6/20.	wmk.	SQL, ENDSQL added to /sysprocs copy
+# 1/30/21.	wmk.	2ys, nyes, yes prompt input files added; UNLOAD,
+# 1/30/21.	 InstallTPadI added
+# 2/11/21.	wmk.	log messages consolidated with date/time stamp.
+# 3/22/21.	wmk.	bug fix where log messages not going to main system log.
+# 6/15/21.	wmk.	documentation; code improvements; persistent Ubuntu
+# 6/15/21.	 detection/ignore.
+#endmods
+# check if running on persistent system..
+if [ "$USER" != "ubuntu" ]; then
+ echo "  COLDSTART attempted on persistent system - abandoned."
+ read -p "Enter ctrl-c to remain in Terminal:"
+ exit 0
+fi
+timedatectl set-timezone America/New_York #
+export SYS_VERSION=ubuntu-Version-18.0.4
+system_log="/media/ubuntu/Windows/ubuntu/SystemLog.txt"
+touch $system_log #
+date +%F.%H.%M.%S | sed 's/$/ System COLDSTART initiated. &/' >> $system_log #
+#echo "  System COLDSTART initiated." >> $system_log #
+echo "  System COLDSTART initiated."
+# create $TEMP_PATH directory
+mkdir ~/temp
+# copy configuration files to $HOME
+#date +%T >> $system_log #
+#date +%H.%M.%S") |sed 's/$/  Copying configuration files... &/'  >> $system_log #
+printf "%s%s\n" "$(date +%H.%M.%S)" ".  Copying configuration files..."  >> $system_log
+echo "  Copying configuration files..."
+# first, copy config.sh
+cd $HOME
+export startup_src=/media/ubuntu/Windows/ubuntu/sysstart
+export config_src=/media/ubuntu/Windows/GitHub/VersionControl
+export SYSID=HP2
+pushd ./ > /dev/null
+cd .config
+# load Machine configuration.
+if ! test -d Machine;then
+ mkdir Machine
+fi
+cp -pv $startup_src/config.sh.$SYSID.mach.v3 ./Machine/config.sh
+# load basic Territories configuration.
+#if ! test -d Territories;then
+# mkdir Territories
+#fi
+#export CONFIG_PATH=$HOME/.config/Territories
+#cp -p $startup_src/config.sh.$SYSID ./Territories/config.sh
+popd > /dev/null
+# next copy *bash and *git files.
+cp -p $startup_src/.bashrc.v3.$SYSID ./.bashrc
+cp -p $startup_src/.bash_aliases.v3.$SYSID ./.bash_aliases
+cp -p $startup_src/.gitconfig ./
+# copy startup shells to $HOME/sysstart.
+cd ~
+if ! test -d sysstart;then mkdir sysstart;fi
+ date +%T  | sed 's/$/  Creating ~\/sysstart... &/' >> $system_log #
+ echo "  Creating ~/sysstart.." >> $system_log
+ echo "  Creating ~/sysstart.."
+ cp -p $startup_src/COLDSTARTv3.$SYSID ./sysstart
+ cp -p $startup_src/COLDSTARTv3_1.$SYSID ./sysstart
+ cp -p $startup_src/QUICKSTART ./sysstart
+ cp -p $startup_src/WARMSTART ./sysstart
+ if test -f $startup_src/StartupNote.txt;then
+  cp -p $startup_src/StartupNote.txt ./sysstart
+ fi
+# end $HOME/sysstart
+# copy sysprocs shells to $HOME/sysprocs
+if ! test -d sysprocs;then mkdir sysprocs;fi
+# date +%T >> $system_log #
+ date +%T  | sed 's/$/  Creating ~\/sysprocs... &/' >> $system_log #
+ echo "  Creating ~/sysprocs.." >> $system_log #
+ echo "  Creating ~/sysprocs.."
+sysproc_src=/media/ubuntu/Windows/ubuntu/sysprocs
+ cp -p $startup_src/term_ ./sysprocs
+ cp -p $startup_src/termx_ ./sysprocs
+ cp -p $sysproc_src/KillTPad.sh ./sysprocs
+ cp -p $sysproc_src/EnblTPad.sh ./sysprocs
+ cp -p $sysproc_src/Installgit.sh ./sysprocs
+ cp -p $sysproc_src/InstallGeany.sh ./sysprocs
+ cp -p $sysproc_src/InstallJRE.sh ./sysprocs
+ cp -p $sysproc_src/InstallSQLite.sh ./sysprocs
+ cp -p $sysproc_src/PJDUMP ./sysprocs
+# cp -p $sysproc_src/PF-Utilities-README.txt ./sysprocs
+ cp -p $sysproc_src/InstallZoom.sh ./sysprocs
+ cp -p $sysproc_src/InstallFlowBlade.sh ./sysprocs
+ cp -p $sysproc_src/SYSEDITv3.HP2 ./sysprocs/SYSEDITv3
+ cp -p $sysproc_src/SYSEDITv3.HP2 ./sysprocs/SYSEDIT
+ cp -p $sysproc_src/SETBACK ./sysprocs
+ cp -p $sysproc_src/EJECT ./sysprocs
+ cp -p $sysproc_src/LISTENV ./sysprocs
+ cp -p $sysproc_src/Installtestdisk.sh ./sysprocs
+ cp -p $sysproc_src/InstallBuild.sh ./sysprocs
+ cp -p $sysproc_src/InstallMarkdown.sh ./sysprocs
+ cp -p $sysproc_src/Installgawk.sh ./sysprocs
+ cp -p $sysproc_src/UpdateLibre7p5.sh ./sysprocs
+ cp -p $sysproc_src/PSFIND ./sysprocs
+ cp -p $sysproc_src/SQL ./sysprocs
+ cp -p $sysproc_src/ENDSQL ./sysprocs
+ cp -p $sysproc_src/UNLOAD ./sysprocs
+ cp -p $sysproc_src/InstallTPadI.sh ./sysprocs
+ cp -p $sysproc_src/ChangeSubsys.sh ./sysprocs
+ cp -p $sysproc_src/ChangeTerr.sh ./sysprocs
+ cp -p $sysproc_src/syseditsv3.sh ./sysprocs
+# end $HOME/sysprocs
+ date +%T >> $system_log #
+ echo "" > nyes
+ echo "y" >> nyes
+ echo "y" > 2ys
+ echo "y" >> 2ys
+ echo "y" > yes
+ echo "" >> yes
+ echo "  COLDSTART complete." >> $system_log #
+date +%H.%M.%S | sed 's/$/  COLDSTART complete. &/'  >> $system_log # echo "  COLDSTART complete."
+# advise terminal restart and run COLDSTART_1
+if test -f ~/sysstart/StartupNote.txt;then
+ cat ~/sysstart/StartupNote.txt
+fi
+echo "Exit Terminal then restart Terminal to run COLDSTART_1v3"
