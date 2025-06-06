@@ -1,8 +1,12 @@
 # config.sh.HP2.terr1 - FLsara86777 Territories system HP-Pavilion configuration.
+echo " ** config.sh.HP2.terr1 out-of-date **";exit 1
+# 2025-06-06.	wmk.	(automated) mods for build level 4.0.16.
 #	11/2/23.	11:58
 #
 # Modification History.
 # ---------------------
+# 6/6/25.	wmk.	(automated) echo,s to printf,s throughout.
+# 6/6/25.	wmk.	(automated) build level 4.0.16.
 # 11/2/23.	wmk.	name change to config.sh.HP2.terr1; add configuration paths
 #			 for state/county/cong-specific configuration (document somewhere?).
 # 10/3/23.	wmk.	SYSID=HP1, machine_name=HP-Pavilion; hosttype=HPW (HP with

@@ -1,8 +1,12 @@
 # config.sh.HP2.tutor -  Tutoring system HP-Pavilion configuration/system information.
+echo " ** config.sh.HP2.tutor out-of-date **";exit 1
+# 2025-06-06.	wmk.	(automated) mods for build level 4.0.16.
 #	12/8/23.	wmk.	10:02
 #
 # Modification History.
 # ---------------------
+# 6/6/25.	wmk.	(automated) echo,s to printf,s throughout.
+# 6/6/25.	wmk.	(automated) build level 4.0.16.
 # 12/8/23.	wmk.	original code; for Tutoring adapted from Accounting.
 # 12/9/23.	wmk.	*codebase, *pathbase definitions added.
 # Legacy mods.
