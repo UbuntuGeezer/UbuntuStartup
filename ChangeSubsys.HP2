@@ -1,0 +1,235 @@
+#!/bin/bash
+# ChangeSubsys.sh - Change subsystem environments (HPChrome).
+#	12/12/23.	wmk.
+#
+# Usage. . ./ChangeSubsys.sh [<libspec>]
+#
+# 	<libspec> = (optional, mandatory if subsys changing to is "LIBRARIES")
+#				 library specification; default Territories/FLsara86777
+#
+# Modification History.
+# ---------------------
+# 10/18/23.	wmk.	HP2 system adaptation; use config.sh.HP2.acctg for
+#			 Accounting; use config.sh.HP2 for Territories/TerritoriesCB;
+#			 *SUBSYS set with all uppercase; *session environment var set to
+#			 match SUBSYS.
+# 11/2/23.	wmk.	LIBRARIES subsystem default
+#			 lib_path=TerrCode86777/Territorieslib/FLsara86777.
+# 11/7/23.	wmk.	CONFIG subsystem added for working on system configuration
+#			 projects.
+# 12/8/23.	wmk.	add Tutoring subsystem; system paths elminated to Ver3.0.
+# 12/12/23.	wmk.	manual MERGE with GitHub/Lenovo ChangeSubsys; popd to
+#		     /dev/null; TERRITORIESCB *codebase corrected to
+#			 TerrCode86777/FLsara86777cb.
+# Legacy mods
+# 10/16/23.	wmk.	add code to automatically execute the appropriate config.sh
+#			 configuration for the subsystem switching to (HPChrome).
+# Legacy mods.
+# 9/16/23.	wmk.	add Libraries subsystem support; this requries the user to
+#			 specify which library, and in the case of Territories which
+#			 conglib; <libspec> is a new passed parameter to ChangeSubsys.
+# 9/18/23.	wmk.	code checked for HPChrome compatibility; if 'libraries'
+#			 subsystem check for RmOldAliases and run, prompt user to run
+#			 'source folders.sh' on completion.
+# 10/2/23.	wmk.	merge HPChrome with GitHub Lenovo.
+# 10/23/23.	wmk.	HPChrome mods brought across; adjust 'cp code for *CB1
+#			 system.
+# Legacy mods.
+# 8/30/23.	wmk.	mods for HPPavilion branch.
+# 9/6/23.	wmk.	ver2.0 path updates; *folderbase corrected.
+# Legacy mods. (from Chromebook branch)
+# 10/30/22.	wmk.	add x xCodeBase, x CodeBase to end prompt.
+# Legacy mods.
+# 5/23/22.	wmk.	original code.
+# 5/24/22.	wmk.	NewTerritories added to prompt list.
+# 5/29/22.	wmk.	-z check on *REPLY*.
+# 6/23/22.	wmk.	add Accounting to subsytems list; add pathbase reset
+#			 based on SUBSYS;
+# 7/20/22.	wmk.	add JWPUB to subsystems list.
+#
+# Notes. <libspec> must be a valid folder specification residing in the
+# GitHub/Libraries-Project parent folder. It will either be a *conglib name
+# (e.g. FLsara86777) or a Territories/*conglib path
+# (e.g. Territories/FLsara86777). The project will have its own Procs-Dev
+# folder. ChangeSubsys to a LIBRARIES subsystem will automatically load
+# the Procs-Dev/folders.sh shell using the *source utility. This will enable
+# continuing to use the cd.*.sh shells to change folders while working within
+# the specified library.
+# [P1=<libspec>]
+P1=$1
+echo " Current subsytem: $SUBSYS"
+echo "Enter new SUBSYSTEM {Accounting Config Libraries Territories"
+read -p " TerritoriesCB Tutoring NewTerritories WikeeComm  <null>}: "
+if [ ! -z "$REPLY" ];then
+ NEWSYS=${REPLY^^}
+ case $NEWSYS in
+ "ACCOUNTING" )
+  NEWSYS=Accounting
+  export session=Accounting
+  export xSUBSYS=$SUBSYS
+  export SUBSYS=ACCOUNTING
+  export git_path=$WINGIT_PATH
+  export CONFIG_PATH=$HOME/.config/Accounting
+  if ! test -d $CONFIG_PATH;then
+   pushd ./ > /dev/null
+   cd $HOME/.config
+   mkdir Accounting
+   popd > /dev/null
+  fi
+  pushd ./ > /dev/null
+  cd $CONFIG_PATH
+  if ! test -f config.sh;then
+   cp -pv $git_path/ShellFiles/config.sh.HP2.acctg config.sh
+  fi
+  popd
+  ;;
+ "CONFIG")
+   NEWSYS=CONFIG
+   export session=Accounting
+   export xSUBSYS=$SUBSYS
+   export SUBSYS=ACCOUNTING
+   export git_path=$WINGIT_PATH
+   export CONFIG_PATH=$HOME/.config/Machine
+   if ! test -d $CONFIG_PATH;then
+    pushd ./ > /dev/null
+    cd $HOME/.config
+    mkdir Machine
+    popd > /dev/null
+   fi
+   pushd ./ > /dev/null
+   cd $CONFIG_PATH
+   if ! test -f config.sh;then
+    cp -pv $WINUBUNTU_PATH/sysstart/config.sh.HP2.mach config.sh
+   fi
+   popd
+  ;;
+ "JWPUB" )
+  NEWSYS=JWPUB
+  export session=JWPublishing
+  ;;
+ "LIBRARIES" )
+  export session=Libraries-Project
+  if [ -z "$P1" ];then
+#   lib_path=Territories/FLsara86777
+   lib_path=TerrCode86777/Territorieslib/FLsara86777
+  else
+   lib_path=$P1
+  fi
+  # check for valid libspec
+  if ! test -d $WINGIT_PATH/Libraries-Project/$P1;then
+   echo "ChangeSubsys <libspec> - unable to locate $P1 - abandoned."
+   read -p "Enter ctrl-c to remain in Terminal: "
+   exit 1
+  fi
+  export xSUBSYS=$SUBSYS
+  export SUBSYS=$NEWSYS
+  export subsys=$SUBSYS
+  export xpathbase=$pathbase
+  export pathbase=$folderbase/Territories/FL/SARA/86777
+  export codebase=$WINGIT_PATH/$lib_path
+  if test -f $codebase/src/Procs-Dev/RmOldAliases.sh;then
+   . $codebase/src/Procs-Dev/RmOldAliases.sh
+  fi
+  if test -f $codebase/src/Procs-Dev/folders.sh;then
+   cd $codebase/src/Procs-Dev
+   echo "run 'source folders.sh'"
+  fi
+  ;;
+ "WIKIEECOMM" )
+  NEWSYS=WikeeComm
+  export session=WikeeComm
+  ;;
+ "TERRITORIES" )
+  NEWSYS=TERRITORIES
+  export session=Territories
+  export xSUBSYS=$SUBSYS
+  export SUBSYS=$NEWSYS
+  export subsys=$SUBSYS
+  export xpathbase=$pathbase
+  export pathbase=$folderbase/Territories/FL/SARA/86777
+  export codebase=$WINGIT_PATH/TerritoriesCB/FLsara86777
+  export git_path=$WINGIT_PATH
+  export CONFIG_PATH=$HOME/.config/Territories
+  if ! test -d $CONFIG_PATH;then
+   pushd ./ > /dev/null
+   cd $HOME/.config
+   mkdir Territories
+   popd > /dev/null
+  fi
+  pushd ./ > /dev/null
+  cd $CONFIG_PATH
+  if ! test -f config.sh;then
+   cp -pv $git_path/ShellFiles/config.sh.HP2 config.sh
+  fi
+  popd
+  if test -f $codebase/Procs-Dev/folders.sh;then
+   source $codebase/Procs-Dev/folders.sh
+   echo "  (folders.sh functions loaded.)"
+  fi
+  ;;
+ "TERRITORIESCB" )
+  NEWSYS=TERRITORIESCB
+  export session=TerritoriesCB
+  export xSUBSYS=$SUBSYS
+  export SUBSYS=$NEWSYS
+  export subsys=$SUBSYS
+  export xpathbase=$pathbase
+  export pathbase=$folderbase/Territories/FL/SARA/86777
+  export codebase=$WINGIT_PATH/TerrCode86777/FLsara86777cb
+  export git_path=$WINGIT_PATH
+  export CONFIG_PATH=$HOME/.config/Territories
+  ;;
+ "TUTORING" )
+  NEWSYS=Tutoring
+  export session=Tutoring
+  export xSUBSYS=$SUBSYS
+  export SUBSYS=TUTORING
+  export APPCONFIG_PATH=$HOME/.config/Tutoring
+  if ! test -d $APPCONFIG_PATH;then
+   pushd ./ > /dev/null
+   cd $HOME/.config
+   mkdir Tutoring
+   popd > /dev/null
+  fi
+  pushd ./ > /dev/null
+  cd $APPCONFIG_PATH
+  if ! test -f config.sh;then
+   cp -pv $git_path/ShellFiles/config.sh.HP2.tutor config.sh
+  fi
+  . $APPCONFIG_PATH/config.sh
+  echo "Environment set for Tutoring subsystem."
+  popd > /dev/null
+  ;;
+ "NEWTERRITORIES" )
+  NEWSYS=NewTerritories
+  export session=NewTerritories
+  ;;
+ * )
+  echo "ChangeSubsys {Accounting Config WikeeComm Territories NewTerritories NULL}"
+  echo "  unrecognized option - abandoned."
+  read -p "Enter ctrl-c to remain in Terminal: "
+  exit 1
+  ;;
+ esac
+ # execute the configuration shell for the subsystem.
+ if test -f $CONFIG_PATH/config.sh;then . $CONFIG_PATH/config.sh;fi
+ ~/sysprocs/LISTENV
+  # now prompt the user to issue the following commands:
+ if [[ SUBSYS =~ TERRITORIES ]];then
+  echo "** To complete setup for Territories/TerritoriesCB subsystem **"
+  echo " enter the following commands.. "
+  echo "  export xSUBSYS=*SUBSYS"
+  echo "  export SUBSYS=*NEWSYS"
+  echo "  export subsys=*SUBSYS"
+  echo "  export xpathbase=*pathbase"
+  echo "  export pathbase=*folderbase/*NEWSYS"
+  echo "  export xcodebase=*codebase"
+  echo "  export xcodebase=*folderbase/GitHub/TerritoriesCB"
+  echo "  cda"
+  echo "  LISTENV"
+ fi
+else
+ echo "ChangeSubsys <null> entry - SUBSYSTEM unchanged."
+ ~/sysprocs/LISTENV
+fi	# end not null entry test
+# end ChangeSubsys.sh

@@ -1,4 +1,5 @@
 #!/bin/bash
+echo " ** SYSEDITv3.HP2.bak out-of-date **";exit 1
 # SYSEDITv3.HP2 - Perform update to HP-Pavilion running 3.x system.
 #
 #	11/30/23.	wmk.	09:40

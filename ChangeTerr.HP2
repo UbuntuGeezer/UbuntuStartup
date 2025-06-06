@@ -1,0 +1,66 @@
+#!/bin/bash
+# ChangeTerr.sh - Change congregation territory environments.
+#	11/13/23.	wmk.
+#
+# Usage . ./ChangeTerr.sh (execute in running bash session)
+#
+# Modification History.
+# ---------------------
+# 9/14/23.	wmk.	bug fix setting *codebase; add source ..folders.sh to define
+#			 all system-dependent cd.*.sh commands.
+# 9/15/23.	wmk.	Usage added to header.
+# 10/4/23.	wmk.	MERGE HPPavilion2 with origin/Lenovo branch.
+# 10/14/23.	wmk.	*congterr corrected to use uppercase county.
+# 11/13/23.	wmk.	ALWAYS execute *HOME/.config/Territories/config.sh and
+#			 follow with lsconfig.sh terr to display territory configuration.
+# Legacy mods.
+# 8/26/23.	wmk.	move *codebase redefinition to end; *codebase set to point
+#			 to TerritoriesCB/*congterr.
+# 8/30/23.	wmk.	updated for HPPavilion system.
+# 9/6/23.	wmk.	ver2.0 system support; correct *codebase path using new
+#			 territory *conglib.
+# 9/15/23.	wmk.	source folders.sh invoked for territory switched to.
+# Legacy mods. (Chromebook system)
+# 10/4/22.	wmk.	*codebase env var support.
+# Legacy mods.
+# 5/20/22.	wmk.	original code.
+# 5/23/22.	wmk.	*congpath* env var support.
+# 5/29/22.	wmk.	-z test on *newspec*.
+# 7/31/22.	wmk.	bug fix pathbase assignment corrected.
+echo " Current territory settings: state: ${congterr:0:2}  county: ${congterr:2:4}  congno: ${congterr:6}"
+read -p "Enter new settings as 'state/county/congno': "
+export newspec=${REPLY^^}
+export xpathbase=$pathbase
+export xcongterr=$congterr
+export xconglib=$conglib
+export xterrdflt=$terrdflt
+#if [ ! -z "$newspec" ];then
+# echo $newspec |mawk '{print "#!/bin/bash"}{print "newstate=" $1}{print "newcounty=" $2}{print #"newcong=" $3}' > justdoit.sh;chmod +x justdoit.sh
+# ./justdoit.sh
+#else
+# export congpath=""
+#fi
+if [ ! -z $newspec ];then
+ export newstate=${newspec:0:2}
+ tempcounty=${newspec:3:4}
+ export newcounty=${tempcounty,,}
+ export newcong=${newspec:8}
+ export congpath=$newspec
+ export pathbase=$folderbase/Territories/$newspec
+ export terrdflt=$pathbase
+ export congterr=$newstate$tempcounty$newcong
+ export conglib=$newstate${newcounty,,}$newcong
+ export codebase=$folderbase/GitHub/TerritoriesCB/$conglib
+ source $codebase/Procs-Dev/folders.sh
+ if [[ "$APPCONFIG_PATH" =~ .*Territories ]];then
+  . $HOME/.config/Territories/config.sh
+  $HOME/sysprocs/lsconfig.sh terr
+ else
+  echo "**WARNING: *APPCONFIG_PATH not pointing to Territories/config.sh **"
+ fi	# end APPCONFIG_PATH defined
+else
+ echo " ** no new settings - ChangeTerr complete. **"
+fi
+~/sysprocs/LISTENV
+source $codebase/Procs-Dev/folders.sh
+# end ChangeTerr.sh

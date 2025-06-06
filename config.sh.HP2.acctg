@@ -1,0 +1,29 @@
+# config.sh.HP2.acctg -  Accounting system HP-Pavilion configuration/system information.
+#	10/18/23.	11:16
+#
+# Modification History.
+# ---------------------
+# 10/18/23.	wmk.	Accounting configuration 2.2.10; adapted from 2.2.9
+#			 (HPChrome).
+# 10/16/23.	wmk.	original configuration 2.2.9; adapted from Territories.
+# 10/16/23.	wmk.	CONFIG_PATH added to configuration.
+# Legacy mods.
+# 10/3/23.	wmk.	config.sh files separated by *SYSID; confg.sh.*SYSID.
+# Legacy mods
+# 9/21/23.	wmk.	SYSID=CB2, machine_name=HP-Chromebook.
+# 10/2/23.	wmk.	merged HPChrome with GitHub Lenovo; HPChrome definitions
+#			 retained where possible, commented where not.
+export machine_name=HP-Pavilion
+export SYSID=HP2
+export OS_VERSION=ubuntu-Version-18.0.4
+export RU_BUILD=2.0.2 
+export SC_BUILD=2.0.3
+export SRC_BUILD=2.2.2
+export SYS_VERSION=$OS_VERSION/$SC_BUILD/$RU_BUILD
+export CONFIG_PATH=$HOME/.config/Accounting
+export CONFIG_VERSION=2.2.10
+export SUBSYS=ACCOUNTING
+export hosttype=HPW
+export libre_version=7.5.6.2
+export git_path=/media/ubuntu/Windows/GitHub
+# end config.sh

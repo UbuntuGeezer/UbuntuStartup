@@ -1,0 +1,32 @@
+# config.sh.HP2.mach -  HP-Pavilion machine configuration/system information.
+#	11/6/23.	wmk.	07:15
+#
+# Modification History.
+# ---------------------
+# 11/5/23.	wmk.	original configuration; SYSID=HP2, machine_name=HP-Pavilion
+#			 hosttype=HPW (HP with /media//Windows HDD)
+# 11/6/23.	wmk.	CONFIG_VERSION 2.3.1; *folderbase, *systemlog definitions
+#			 added; CONFIG_VERSION 2.3.2, SYS_VERSION bug fix.
+# Legacy mods.
+# 10/3/23.	wmk.	SYSID=HP1, machine_name=HP-Pavilion; hosttype=HPW (HP with
+#			 Windows (sans Users/Bill) file system.
+# 10/4/23.	wmk.	libreversion updated to 7.5.6.2.
+# 10/7/23.	wmk.	SYSID=HP2, CONFIG_VERSION 2.2.6.
+# 10/11/23.	wmk.	git_path=/media/ubuntu/Windows/GitHub; CONFIG_VERSION
+#		 	 = 2.2.7
+# Legacy mods.
+# 9/21/23.	wmk.	SYSID=CB2, machine_name=HP-Chromebook.
+# 10/2/23.	wmk.	merged HPChrome with GitHub Lenovo; HPChrome definitions
+#			 retained where possible, commented where not.
+export machine_name=HP-Pavilion
+export SYSID=HP2
+export OS_VERSION=ubuntu-Version-18.0.4
+export SYS_VERSION=$OS_VERSION
+export CONFIG_PATH=$HOME/.config/Machine
+export CONFIG_VERSION=2.3.2
+export hosttype=HPW
+export folderbase=/media/ubuntu/Windows
+export system_log=$folderbase/ubuntu/SystemLog.txt
+export libre_version=7.5.6.2
+export git_path=/media/ubuntu/Windows/GitHub
+# end config.sh

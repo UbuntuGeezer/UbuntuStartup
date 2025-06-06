@@ -1,0 +1,32 @@
+# config.sh.HP2.tutor -  Tutoring system HP-Pavilion configuration/system information.
+#	12/8/23.	wmk.	10:02
+#
+# Modification History.
+# ---------------------
+# 12/8/23.	wmk.	original code; for Tutoring adapted from Accounting.
+# 12/9/23.	wmk.	*codebase, *pathbase definitions added.
+# Legacy mods.
+# 10/18/23.	wmk.	Accounting configuration 2.2.10; adapted from 2.2.9
+#			 (HPChrome).
+# 10/16/23.	wmk.	original configuration 2.2.9; adapted from Territories.
+# 10/16/23.	wmk.	CONFIG_PATH added to configuration.
+# Legacy mods.
+# 10/3/23.	wmk.	config.sh files separated by *SYSID; confg.sh.*SYSID.
+# Legacy mods
+# 9/21/23.	wmk.	SYSID=CB2, machine_name=HP-Chromebook.
+# 10/2/23.	wmk.	merged HPChrome with GitHub Lenovo; HPChrome definitions
+#			 retained where possible, commented where not.
+export machine_name=HP-Pavilion
+export SYSID=HP2
+export OS_VERSION=ubuntu-Version-18.0.4
+export SYS_VERSION=$OS_VERSION/$SC_BUILD/$RU_BUILD
+export CONFIG_PATH=$HOME/.config/Machine
+export APPCONFIG_PATH=$HOME/.config/Tutoring
+export CONFIG_VERSION=2.2.10
+export SUBSYS=TUTORING
+export hosttype=HPW
+export codebase=$folderbase/Tutoring
+export pathbase=$folderbase/Tutoring
+export libre_version=7.5.6.2
+export git_path=/media/ubuntu/Windows/GitHub
+# end config.sh
