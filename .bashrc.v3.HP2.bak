@@ -1,0 +1,268 @@
+#.bashrc.v2.HP2 executed by bash for HP Pavilion (ver2) non-login shells.
+#	11/1/23.	wmk.	10:02
+#
+# Exit.	if not running interactively, do nothing
+#	bash runs ./bash_aliases
+#
+# Modification History.
+# ---------------------
+# 11/6/23.	wmk.	major revision for machine versions 2.3.x; .bashrc now
+#			 invokes *HOME/.config/Machine/config.sh to set up the system-wide
+#			 environment variables for each Terminal session; *terrdflt,
+#			 *rupath, *scpath, *SUBSYS removed.
+# 11/11/23.	wmk.	bug fix missing 'fi in execute config.sh.
+# Legacy mods.
+# 10/3/23.	wmk.	.bashrc filename extended with *SYSID=HP2.
+# Legacy mods.
+# 9/15/23.	'Ubuntu 18.04.3 LTS' set in *SYS_VERSION; *SYSID = HP2.
+# 9/12/23.	ubuntu-18.04.3-LTS/Territories-ver2.x set in *SYS_VERSION.
+# Legacy mods.
+# 8/31/23.	wmk.	modified for simplified *WINGIT_PATH and *WINUBUNTU_PATH
+#			 definitions on Windows HDD file system; all environment vars are 
+#			 set in this file for consistency; *folderbase now points to
+# 8/31/23.	wmk.	08:30
+#			 *u_disk/Windows; all aliases moved to .bash_aliases.
+# 9/4/23.	wmk.	issue message about startup version 2.0; LS_COLORS env var
+#			 truncated to a working string.
+# 9/5/23.	wmk.	isChrome always set to 0 since this is HP Pavilion system.
+# 9/7/23.	wmk.	*sysid environment var set to 'HP2'.
+# 9/15/23.	wmk.	Ubuntu 18.04.3 LTS set as os name.
+# Legacy mods.
+# 6/4/22.	wmk.	local mods removed to .bash_aliases.
+# 7/29/22.	wmk.	HP/Chromebook dual support.
+# 8/27/23.	wmk.	aliases updated; UpdateLibre -> UpdateLibre6p4;
+#			 mk -> mk.sh; TIME_SYLE env var set to 'long-iso' for new
+#			 ArchivingBackups utility shells.
+# 8/29/23.	wmk.	set CALC_LIB-PATH for LibreOffice app user libraries.
+# 9/3/23.	wmk.	issue ver1.x message on startup
+# Legacy mods.
+# 3/17/21.	wmk.	last modification for 262system.
+# 6/4/21.	wmk.	added SANDISK1, SANDISK2 env vars for flash drives.
+# 6/13/21.	wmk.	multihost support generalized; exit documentation added.
+# 6/14/21.	wmk.	cdq added to aliases.
+# 6/30/21.	wmk.	tar_ added to aliases.
+# 9/10/21.	wmk.	cdab added to aliases.
+# 9/25/21.	wmk.	cdz added to aliases.
+# 11/17/21.	wmk.	cdr added to aliases.
+# 11/18/21.	wmk.	cdrb added to aliases.
+# 11/28/21.	wmk.	cdts, cdss added to aliases.
+# 3/30/22.	wmk.	aliases updated to match Chromebook system.
+# 4/22/22.	wmk.	markdown added to aliases.
+# 4/27/22.	wmk.	*terrdflt* added to env vars.
+# 4/30/22.	wmk.	x added to aliases (export).
+# 5/9/22.	wmk.	markdown removed from aliases.
+# 5/11/22.	wmk.	cdzs, cdzt added to aliases.
+# 5/22/22.	wmk.	chterr added to aliases.
+# 5/23/22.	wmk.	SUBSYS added to environment vars; chgsubsys, lsalias
+#		 	 aliases added.
+# 5/24/22.	wmk.	DWNLD_PATH added to environment vars.
+# 5/27/22.	wmk.	clrtemp alias added.
+# 6/4/22.	wmk.	md alias added.
+#
+# Notes. Starting with CONFIG_VERSION 2.3.0 .bashrc executes the config.sh
+# shell from the *HOME/.config/Mach folder. This departs from the former setup
+# where the config.shell was run from the *HOME/.config/Territories folder.
+#
+# ../Mach/config.sh (copied from config.sh.<sysid>) now only sets the machine-
+# relevant environment variables. The susbystem-relevant environment variables
+# are now set from each subsystem's config.sh shell. See each subsystem's
+# version control project for details (TerrVersion, AcctVersion).
+#	
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples
+
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
+echo "** You are running ver2.x of the non-persistent system. **"
+echo " To run ver1.x restart the system and run COLSTARTv1 "
+export SYS_VERSION=ubuntu-18.0.4/Territories-ver2.x
+
+# don't put duplicate lines or lines starting with space in the history.
+# See bash(1) for more options
+HISTCONTROL=ignoreboth
+
+# append to the history file, don't overwrite it
+shopt -s histappend
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+HISTSIZE=1000
+HISTFILESIZE=2000
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# If set, the pattern "**" used in a pathname expansion context will
+# match all files and zero or more directories and subdirectories.
+#shopt -s globstar
+
+# make less more friendly for non-text input files, see lesspipe(1)
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+# set variable identifying the chroot you work in (used in the prompt below)
+if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
+fi
+
+# set a fancy prompt (non-color, unless we know we "want" color)
+case "$TERM" in
+    xterm-color|*-256color) color_prompt=yes;;
+esac
+
+# uncomment for a colored prompt, if the terminal has the capability; turned
+# off by default to not distract the user: the focus in a terminal window
+# should be on the output of commands, not on the prompt
+#force_color_prompt=yes
+
+if [ -n "$force_color_prompt" ]; then
+    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+	# We have color support; assume it's compliant with Ecma-48
+	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+	# a case would tend to support setf rather than setaf.)
+	color_prompt=yes
+    else
+	color_prompt=
+    fi
+fi
+
+if [ "$color_prompt" = yes ]; then
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+else
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+fi
+unset color_prompt force_color_prompt
+
+# If this is an xterm set the title to user@host:dir
+case "$TERM" in
+xterm*|rxvt*)
+    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+    ;;
+*)
+    ;;
+esac
+
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    #alias dir='dir --color=auto'
+    #alias vdir='vdir --color=auto'
+
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+# colored GCC warnings and errors
+#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+
+# some more ls aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+
+# Add an "alert" alias for long running commands.  Use like so:
+#   sleep 10; alert
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+
+# Alias definitions.
+# Aliases are in a seprate file: ./bash_aliases. The aliases are flagged in the
+# GitHub/ShellFiles project with .v2.*SYSID name extension. This distinguishes
+# the alias files unique for each system.
+# See /usr/share/doc/bash-doc/examples in the bash-doc package.
+
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+fi
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+
+# execute the /Machine/config.sh configuration file.
+if [ -f ~/.config/Machine/config.sh ];then
+ . ~/.config/Machine/config.sh
+fi
+
+# parent is NOT a chromeos system.
+export isChrome=0
+
+#set some global vars based on which system using...
+# first set *folderbase and u_disk
+# vars now set by  /Machine/config.sh
+if [ -z "machine_name" ];then
+ export machine_name=HP-Pavilion-Notebook
+ export SYSID=HP2
+ export SYS_VERSION=ubuntu-18.04.3-LTS/Territories-ver2.x
+ if [ $isChrome -eq 0 ]; then
+  export sysid=$SYSID
+  export folderbase=/media/ubuntu/Windows
+  export U_DISK=/media/$USER
+  export u_disk=$U_DISK
+ else
+  export sysid=$SYSID
+  export folderbase=$HOME
+  export U_DISK=/mnt/chromeos/removable
+  export u_disk=/mnt/chromeos/removable
+ fi
+ # export CALC_LIB_PATH=~/.config/libreoffice/4/user/basic
+fi 	# vars not set my Machine/config.sh
+
+# set DWNLD_PATH
+if [ isChrome -eq 0 ];then
+  export DWNLD_PATH=$folderbase/Downloads
+else
+  export DWNLD_PATH=$HOME/Downloads
+  export DWNLD=/mnt/chromeos/MyFiles/Downloads
+  export dwnld=/mnt/chromeos/MyFiles/Downloads
+fi
+
+# set up critical git and ubuntu paths
+export TIME_STYLE=long-iso
+export WINGIT_PATH=$folderbase/GitHub
+export WINGIT_PATH2=$folderbase/Users/Bill/Documents/GitHub
+export crmgit_path=$folderbase/GitHub
+if [ $isChrome -eq 1 ];then
+ export gitpath=$crmgit_path
+else
+ export gitpath=$WINGIT_PATH
+fi
+export BACKUP_PATH=$U_DISK
+export WINUBUNTU_PATH=$folderbase/ubuntu
+export WINUBUNTU_PATH2=$folderbase/Users/Bill/ubuntu
+export WINCONG_PATH=$folderbase
+export crmcong_path=$folderbase
+# set base path for CALC libraries...
+#export terrdflt=$folderbase/Territories/FL/SARA/86777
+export system_log=$folderbase/ubuntu/SystemLog.txt
+
+if [ $isChrome -eq 1 ];then
+ export sandisk1=C25E-3AC9
+ export sandisk2=BF7F-D7DA
+else
+ export SANDISK1=C25E-3AC9
+ export SANDISK2=BF7F-D7DA
+fi
+# legacy from .bash_aliases...
+#export SANDISK1=3AC9-C25E
+#export SANDISK2=BF7F-D7DA
+
+export TEMP_PATH=$HOME/temp
+export PJ_BACK=git-Projects
+# set territories global vars.
+# all aliases moved to .bash_aliases.
+
+export LS_COLORS='*.rs=0;31:*.di=01;34:*.ln=01;36:*.mh=00;31:*.pi=40;33:*.so=01;35:'
+#*.do=01;35:*.bd=40;33:*.cd=40;33:*.or=40;31:*.mi=01;35:*.su=37;41:*.sg=30;43:.*ca=30;41:*.tw=30;42:*.ow=01;42:*.st=37;44:*.ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'
+

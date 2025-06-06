@@ -1,0 +1,123 @@
+#.bash_aliases.v2.HP2 - user supplied bash aliases for HP-Parilion Territories ver2.x systems.
+#	10/7/23.	wmk.	07:36
+#
+# These alias definitions replace definitions that were formerly in .bashrc.
+#
+# Modification History.
+# ---------------------
+# 10/3/23.	wmk.	original shell; adapted from .bash_aliases.v2 but edited to
+#			 reflect SYSID=HP2; gt alias added; pd, p-d bug fix missing trailing
+#			 ' to terminate command.
+# 10/7/23.	wmk.	lsconfig alias added.
+# Legacy mods.
+# 8/31/23.	wmk.	modified for simplified *WINGIT_PATH and *WINUBUNTU_PATH
+#			 definitions on Windows HDD file system; these definitions should
+#			 only be in .bashrc, not here; only aliases appear in this file for
+#			 consistency. All environment var definitions are consolidated into
+#			 .bashrc.
+# 9/1/23.	wmk.	Installgawk alias added.
+# 9/4/23.	wmk.	.v2 modification for distinction; Terminal session notified.
+# 9/5/23.	wmk.	LOGMSG, InstallJRE aliases remove leading '. '; add
+#			 'version' alias; soffice alias to LibreOffice7.5.
+# 9/6/23.	wmk.	all "cd.*. aliases removed in favor of source *folders.sh;
+#			 all SYSEDIT aliases changed to run in new shell; 'soffice' alias
+#			 added to supercede soffice intrinsic for LibreOffice 6.0.7.
+# 9/15/23.	wmk.	lsenviro alias added; soffice alias to libreoffice7.5.
+# 9/16/23.	wmk.	UpdateLibre alias updated to load UpdateLibre7p5.sh; alias
+#			 defined for syseditv2; syseditsv2 aliased as sysedits.
+# Legacy mods.
+# 7/29/22.	wmk.	modified for dual system HP/Chromebook support; *gitpath
+#			 environment var.
+# 8/27/23.	wmk.	aliases pd, p-d added.
+# 8/29/23.	wmk.	lsess added.
+# 8/30/23.	wmk.	UpdateLibre changed to 6p4; InstallMarkdown added.	
+# Legacy mods.
+# 6/4/22.	wmk.	original code; imported from .bashrc.
+# 6/19/22.	wmk.	rupath, scpath env vars defined for territories.
+# 6/27/22.	wmk.	pd and p-d aliases added for pushd, popd.
+# 7/3/22.	wmk.	mk, logdate, chsubsys added.
+#
+# Alias definitions.
+# This file ~/.bash_aliases is executed by .bashrc on startup of any Terminal
+# session. For Territories 2.x systems ONLY aliases appear in this file. All
+# other system definitions and environment variables are defined in .bashrc.
+# ~/.bash_aliases, instead of adding them here directly.
+# See /usr/share/doc/bash-doc/examples in the bash-doc package.
+# BELOW is what .bashrc does with the .bash_aliases file..
+#if [ -f ~/.bash_aliases ]; then
+#    . ~/.bash_aliases
+#fi
+echo " ** Activating .bash_aliases ver 2.x  $machine_name **"
+echo "  If ver 1.x is desired, reboot and execute COLDSTARTv1..."
+alias BACKLOG='. $HOME/sysprocs/BACKLOG'
+alias COLDSTART_1='. ~/sysstart/COLDSTART_1'
+alias EJECT='. ~/sysprocs/EJECT'
+alias ENDSQL='. ~/sysprocs/ENDSQL'
+alias EnblTPad='. ~/sysprocs/EnblTPad.sh'
+alias GETMSG='. ~/sysprocs/GETMSG'
+alias InstallBless='. ~/sysprocs/InstallBlessHex.sh'
+alias InstallBuild='. ~/sysprocs/InstallBuild.sh'
+alias InstallFlowBlade='. ~/sysprocs/InstallFlowBlade.sh'
+alias InstallGEarth='. ~/sysprocs/InstallGoogleEarth.sh'
+alias InstallGeany='. ~/sysprocs/InstallGeany.sh'
+alias InstallJRE='~/sysprocs/InstallJRE.sh'
+alias InstallMarkdown='. ~/sysprocs/InstallMarkdown.sh'
+alias InstallPython='. ~/sysprocs/InstallPython.sh'
+alias InstallSQL='. ~/sysprocs/InstallSQLite.sh'
+alias InstallTPadI='. ~/sysprocs/InstallTPadI.sh <nyes'
+alias InstallURE='. ~/sysprocs/InstallURE.sh'
+alias InstallWifi='. ~/sysprocs/InstallWifi.sh'
+alias InstallZoom='. ~/sysprocs/InstallZoom.sh'
+alias Installgawk='. ~/sysprocs/Installgawk.sh'
+alias Installgit='. ~/sysprocs/Installgit.sh'
+alias Installmkusb='. ~/sysprocs/Installmkusb.sh'
+alias Installpdftk='. ~/sysprocs/Installpdftk.sh'
+alias Installshellcheck='. ~/sysprocs/Installshellcheck.sh'
+alias Installtestdisk='. ~/sysprocs/Installtestdisk.sh'
+alias KillTPad='. ~/sysprocs/KillTPad.sh'
+alias LISTENV='. ~/sysprocs/LISTENV'
+alias LOGMSG='~/sysprocs/LOGMSG'
+alias NewSSHKey='. ~/sysprocs/NewSSHKey.sh'
+alias PJDUMP='. ~/sysprocs/PJDUMP'
+alias PSFIND='. ~/sysprocs/PSFIND'
+alias SETBACK='. ~/sysprocs/SETBACK'
+alias SETMSG='. ~/sysprocs/SETMSG'
+alias soffice='/usr/local/bin/libreoffice7.5'
+alias SQL='. ~/sysprocs/SQL'
+alias SYSEDIT='~/sysprocs/SYSEDITv2'
+alias sysedit='~/sysprocs/SYSEDITv2'
+alias syseditv2='~/sysprocs/SYSEDITv2'
+alias ToSysstart='. ~/sysprocs/CP-Sysstart.sh'
+alias UNLOAD='. ~/sysprocs/UNLOAD'
+alias UpdateLibre='. ~/sysprocs/UpdateLibre7p5.sh'
+alias version='echo $SYS_VERSION'
+alias WARMSTRT='. $HOME/sysstart/WARMSTART'
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+# all cd..aliases removed in favor of *folders.shell.
+alias chsubsys='. ~/sysprocs/ChangeSubsys.sh'
+alias chterr='. ~/sysprocs/ChangeTerr.sh'
+alias clrtemp='. ~/sysprocs/ClearTEMP'
+alias ga='git add'
+alias got='git'
+alias gt='gedit $WINGIT_PATH/token4.txt'
+alias installs='. ~/sysprocs/installs.sh'
+alias l='ls -CF'
+alias la='ls -A'
+alias listenv='. ~/sysprocs/LISTENV'
+alias ll='ls -alF'
+alias logdate='. ~/sysprocs/logdate'
+alias lsalias='. ~/sysprocs/lsalias.sh'
+alias lsconfig='. ~/sysprocs/lsconfig.sh'
+alias lsenvir='. ~/sysprocs/lsenvir.sh'
+alias lsess='echo $session'
+alias mk='. ~/sysprocs/mk.sh'
+alias p-d='popd > /dev/null'
+alias pd='pushd ./ > /dev/null'
+alias sysedit='~/sysprocs/SYSEDIT'
+alias sysedits='~/sysprocs/syseditsv2.sh'
+alias tar_='. ~/sysprocs/tar_.sh'
+alias term_='. ~/sysprocs/term_'
+alias termx_='. ~/sysprocs/termx_'
+alias x='export'
+# end .bash_aliases
+
